@@ -16,3 +16,7 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=root
     ports:
       - "8080:80"
+  pipeline:
+    build: .
+    depends_on:
+      - pgdatabase
