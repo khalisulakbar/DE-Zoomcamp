@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # coding: utf-8
-
 import argparse
 import pandas as pd
 import wget
@@ -11,11 +10,11 @@ import os
 
 
 def main(params):
-    user = params.user
-    password = params.password
-    host = params.host
-    port = params.port
-    db = params.db
+    user = os.environ.get('POSTGRES_USER')
+    password = os.environ.get('POSTGRES_PASSWORD')
+    host = os.environ.get('POSTGRES_HOST')
+    port = os.environ.get('POSTGRES_PORT')
+    db = os.environ.get('POSTGRES_DB')
     table_name = params.table_name
     url = params.url
 
@@ -24,9 +23,11 @@ def main(params):
     else:
         csv_name = 'output.csv'
 
-    # URL of the CSV file
-    # url = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz'
-        
+    # Check if any required environment variable is missing or None
+    if None in {user, password, host, port, db}:
+        print("Error: One or more PostgreSQL connection parameters are missing.")
+        return
+
     # Downloading the CSV file
     print('downloading the csv file...')
     wget.download(url, csv_name)
@@ -75,18 +76,10 @@ def main(params):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Ingest CSV data into Postgres')
 
-    # Argument for user, password, host, port, database name, table name, and url
-    parser.add_argument('--user', help='username for postgres')
-    parser.add_argument('--password', help='password for postgres')
-    parser.add_argument('--host', help='host for postgres')
-    parser.add_argument('--port', help='port for postgres')
-    parser.add_argument('--db', help='database name for postgres')
+    # Argument for table name, and url
     parser.add_argument('--table_name', help='name of the table where we will write the results to')
     parser.add_argument('--url', help='url of the csv file')
     args = parser.parse_args()
 
     # Run the main function
     main(args)
-
-
-
