@@ -88,7 +88,7 @@ docker run -it \
 docker run -it \
     --network=pg-network \
     --env-file=.env \
+    taxi_ingest:v003 \
     --table_name=yellow_taxi_trips \
     --url="https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz"
-    taxi_ingest:v001
   
