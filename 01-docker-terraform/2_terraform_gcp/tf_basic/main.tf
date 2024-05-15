@@ -8,13 +8,13 @@ terraform {
 }
 
 provider "google" {
-  credentials = file("./../keys/gcp_creds1.json")
-  project     = "de-zoomcamp-411800"
+  credentials = file("./../keys/gcp_creds2.json")
+  project     = "data-engineering-423323"
   region      = "us-central1"
 }
 
 resource "google_storage_bucket" "demo-bucket" {
-  name          = "de-zoomcamp-411800-terra-bucket"
+  name          = "de-project-4712-bucket"
   location      = "US"
   force_destroy = true
 

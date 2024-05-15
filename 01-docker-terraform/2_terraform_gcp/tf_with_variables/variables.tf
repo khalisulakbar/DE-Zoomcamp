@@ -1,11 +1,11 @@
 variable "credentials" {
   description = "My Credentials"
-  default     = "./../keys/gcp_creds1.json"
+  default     = "./../keys/gcp_creds2.json"
 }
 
 variable "project" {
   description = "Project"
-  default     = "de-zoomcamp-411800"
+  default     = "data-engineering-423323"
 }
 
 variable "region" {
@@ -17,13 +17,13 @@ variable "region" {
 variable "dataset_name" {
   description = "My BigQuery Dataset Name"
   #Update the below to what you want your dataset to be called
-  default = "example_dataset"
+  default = "demo_dataset_1"
 }
 
 variable "gcs_bucket_name" {
   description = "My Storage Bucket Name"
   #Update the below to a unique bucket name
-  default = "de-zoomcamp-411800-terra-bucket"
+  default = "data-engineering-423323-terra-bucket"
 }
 
 variable "gcs_storage_class" {

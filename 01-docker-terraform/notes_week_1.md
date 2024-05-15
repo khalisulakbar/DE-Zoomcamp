@@ -241,9 +241,22 @@ docker run -it \
     --url="https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz"
 ```
 
-## 4. PostgreSQl and PGAdmin with Docker Compose
+## 4. PostgreSQl+PGAdmin and Data Pipeline with Docker Compose (using two containers)
 
-1. Create a Docker Compose file
+prepare .env file, which contains the following environment variables:
+```env
+POSTGRES_USER=root
+POSTGRES_PASSWORD=root
+POSTGRES_HOST=pgdatabase
+POSTGRES_PORT=5432
+POSTGRES_DB=ny_taxi
+
+# pgAdmin
+PGADMIN_DEFAULT_EMAIL=admin@admin.com
+PGADMIN_DEFAULT_PASSWORD=root
+```
+
+1. Create a Docker Compose file for services
 ```dockercompose
 services:
   pgdatabase:
@@ -254,6 +267,8 @@ services:
       - "./ny_taxi_postgres_data:/var/lib/postgresql/data"
     ports:
       - "5432:5432"
+    networks:
+      - pg-network
 
   pgadmin:
     image: dpage/pgadmin4
@@ -264,23 +279,41 @@ services:
 
 networks:
   pg-network:
+    name: pg-network-1
     driver: bridge
 ```
 
-2. Start the containers
+2. Build a Docker image and start the containers
+
+```bash
+docker build -t <image_name> <path_to_dockerfile>
+```
+
+```bash
+docker run -it \
+    --network=pg-networ-1 \ #Connect to the pg-network-1
+    --env-file=.env \
+    taxi_ingest:v003 \
+    --table_name=yellow_taxi_trips \
+    --url="https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz"
+```
+
+3. Start the containers
 ```bash
 docker compose up -d
 ```
 
-3. Connect to PGAdmin
+4. Connect to PGAdmin
     - Go to http://localhost:8080
     - Login with username: admin and password: root
     - Set Up the server
 
-4. Stop the containers
+5. Stop the containers
 ```bash
 docker compose down
 ```
+
+it is important to note that in order two containers to work together, they need to be in the same network. Hence, we created a new network named pg-network-1 and stated it in the Docker Compose file.
 
 ## 2.Terraform
 Terraform is an infrastructure as code tool that lets you build, change, and version cloud and on-prem resources safely and efficiently.
@@ -291,3 +324,5 @@ Terraform creates and manages resources on cloud platforms and other services th
 source: https://developer.hashicorp.com/terraform?product_intent=terraform
 
 ![alt text](image.png)
+
+Terraform simplify the process of keeping track of infrastructure as code. With infrastructure as code, it make it easy to reproduce the same infrastructure configuration in the future, easier to collaborate, and easier to remove.
