@@ -604,5 +604,19 @@ variable "zone" {
   type    = string
   default = "us-central1-b"
 }
-
 ```
+
+## 4. Access GCS VM Instance
+
+Once the infrastructure is created, you can access the VM instance using the following command:
+
+example:
+
+```bash
+gcloud compute ssh --zone "us-central1-b" "de-project01-20240515-100122" --project "data-engineering-423323" --ssh-key-file <path_to_ssh_key>
+```
+
+or,
+
+```bash
+ssh -i ~/.ssh/<ssh_key> ubuntu@<external_ip>
