@@ -2,7 +2,7 @@
 
 Data Engineering is the design and development of systems for collecting, storing and analyzing data at scale.
 
-## 1.Docker
+# Docker
 Docker is a software platform that allows you to build, test, and deploy applications quickly. Docker packages software into standardized units called containers that have everything the software needs to run including libraries, system tools, code, and runtime. Using Docker, you can quickly deploy and scale applications into any environment and know your code will run.
 
 ### 1.1. Build An Image with Dockerfile
@@ -315,7 +315,7 @@ docker compose down
 
 it is important to note that in order two containers to work together, they need to be in the same network. Hence, we created a new network named pg-network-1 and stated it in the Docker Compose file.
 
-## 2.Terraform
+# 2.Terraform
 Terraform is an infrastructure as code tool that lets you build, change, and version cloud and on-prem resources safely and efficiently.
 
 How does Terraform work?
@@ -326,3 +326,283 @@ source: https://developer.hashicorp.com/terraform?product_intent=terraform
 ![alt text](image.png)
 
 Terraform simplify the process of keeping track of infrastructure as code. With infrastructure as code, it make it easy to reproduce the same infrastructure configuration in the future, easier to collaborate, and easier to remove.
+
+## 1. Terraform Setup
+    - Install Terraform
+    - Create a new folder
+    - Go to the folder
+    - Create a new Terraform project
+    - Initialize the project
+        - terraform init
+    - Validate the project
+        - terraform validate
+    - Plan the changes
+        - terraform plan
+    - Apply the changes
+        - terraform apply
+    - Destroy the changes
+        - terraform destroy
+
+## 2. Example Terraform: GCS Bucket
+
+```terraform
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "5.13.0"
+    }
+  }
+}
+
+provider "google" {
+  credentials = file("./../keys/gcp_creds2.json")
+  project     = "data-engineering-423323"
+  region      = "us-central1"
+}
+
+resource "google_storage_bucket" "demo-bucket" {
+  name          = "de-project-4712-bucket"
+  location      = "US"
+  force_destroy = true
+
+  lifecycle_rule {
+    condition {
+      age = 1
+    }
+    action {
+      type = "AbortIncompleteMultipartUpload"
+    }
+  }
+}
+```
+
+Then,
+ - Run `terraform fmt` to format the Terraform code
+ - Run `terraform init` to initialize the Terraform project
+ - Run `terraform plan` to plan the Terraform changes
+ - Run `terraform apply` to apply the Terraform changes
+
+Later, to remove the infrastructure,
+ - Run `terraform destroy` to destroy the Terraform changes
+
+## 3. Example Terraform With Variables: GCS VM Instance
+
+1. Create a Terraform file, `main.tf`.
+
+```terraform
+# This code is compatible with Terraform 4.25.0 and versions that are backwards compatible to 4.25.0.
+# For information about validating this Terraform code, see https://developer.hashicorp.com/terraform/tutorials/gcp-get-started/google-cloud-platform-build#format-and-validate-the-configuration
+terraform {
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "5.13.0"
+    }
+  }
+}
+
+provider "google" {
+  credentials = file("./../keys/gcp_creds2.json")
+  project     = "data-engineering-423323"
+  region      = "us-central1"
+}
+
+resource "google_compute_instance" "example" {
+  boot_disk {
+    auto_delete = var.boot_disk_auto_delete
+    device_name = var.boot_disk_device_name
+
+    initialize_params {
+      image = var.boot_disk_image
+      size  = var.boot_disk_size
+      type  = var.boot_disk_type
+    }
+
+    mode = var.boot_disk_mode
+  }
+
+  can_ip_forward      = var.can_ip_forward
+  deletion_protection = var.deletion_protection
+  enable_display      = var.enable_display
+
+  labels = var.labels
+
+  machine_type = var.machine_type
+  name         = var.name
+
+  network_interface {
+    access_config {
+      network_tier = var.network_tier
+    }
+
+    queue_count = var.queue_count
+    stack_type  = var.stack_type
+    subnetwork  = var.subnetwork
+  }
+
+  scheduling {
+    automatic_restart   = var.automatic_restart
+    on_host_maintenance = var.on_host_maintenance
+    preemptible         = var.preemptible
+    provisioning_model  = var.provisioning_model
+  }
+
+  service_account {
+    email  = var.service_account_email
+    scopes = var.service_account_scopes
+  }
+
+  shielded_instance_config {
+    enable_integrity_monitoring = var.enable_integrity_monitoring
+    enable_secure_boot          = var.enable_secure_boot
+    enable_vtpm                 = var.enable_vtpm
+  }
+
+  zone = var.zone
+}
+```
+
+2. Create a Terraform variables file, `variables.tf`.
+
+```terraform
+variable "boot_disk_auto_delete" {
+  type    = bool
+  default = true
+}
+
+variable "boot_disk_device_name" {
+  type    = string
+  default = "de-project01-20240515-100122"
+}
+
+variable "boot_disk_image" {
+  type    = string
+  default = "projects/ubuntu-os-cloud/global/images/ubuntu-2004-focal-v20240508"
+}
+
+variable "boot_disk_size" {
+  type    = number
+  default = 20
+}
+
+variable "boot_disk_type" {
+  type    = string
+  default = "pd-balanced"
+}
+
+variable "boot_disk_mode" {
+  type    = string
+  default = "READ_WRITE"
+}
+
+variable "can_ip_forward" {
+  type    = bool
+  default = false
+}
+
+variable "deletion_protection" {
+  type    = bool
+  default = false
+}
+
+variable "enable_display" {
+  type    = bool
+  default = false
+}
+
+variable "labels" {
+  type = map(string)
+  default = {
+    goog-ec-src = "vm_add-tf"
+  }
+}
+
+variable "machine_type" {
+  type    = string
+  default = "e2-medium"
+}
+
+variable "name" {
+  type    = string
+  default = "de-project01-20240515-100122"
+}
+
+variable "network_tier" {
+  type    = string
+  default = "PREMIUM"
+}
+
+variable "queue_count" {
+  type    = number
+  default = 0
+}
+
+variable "stack_type" {
+  type    = string
+  default = "IPV4_ONLY"
+}
+
+variable "subnetwork" {
+  type    = string
+  default = "projects/data-engineering-4233/regions/us-central1/subnetworks/default"
+}
+
+variable "automatic_restart" {
+  type    = bool
+  default = true
+}
+
+variable "on_host_maintenance" {
+  type    = string
+  default = "MIGRATE"
+}
+
+variable "preemptible" {
+  type    = bool
+  default = false
+}
+
+variable "provisioning_model" {
+  type    = string
+  default = "STANDARD"
+}
+
+variable "service_account_email" {
+  type    = string
+  default = "xxxxxx@developer.gserviceaccount.com"
+}
+
+variable "service_account_scopes" {
+  type = list(string)
+  default = [
+    "https://www.googleapis.com/auth/devstorage.read_only",
+    "https://www.googleapis.com/auth/logging.write",
+    "https://www.googleapis.com/auth/monitoring.write",
+    "https://www.googleapis.com/auth/service.management.readonly",
+    "https://www.googleapis.com/auth/servicecontrol",
+    "https://www.googleapis.com/auth/trace.append",
+  ]
+}
+
+variable "enable_integrity_monitoring" {
+  type    = bool
+  default = true
+}
+
+variable "enable_secure_boot" {
+  type    = bool
+  default = false
+}
+
+variable "enable_vtpm" {
+  type    = bool
+  default = true
+}
+
+variable "zone" {
+  type    = string
+  default = "us-central1-b"
+}
+
+```
