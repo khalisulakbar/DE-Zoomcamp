@@ -1,4 +1,4 @@
-# Introduction to Docker and Terraform
+# Week 1: Introduction to Docker and Terraform
 
 Data Engineering is the design and development of systems for collecting, storing and analyzing data at scale.
 
