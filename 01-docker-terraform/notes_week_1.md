@@ -245,8 +245,8 @@ docker run -it \
 
 prepare .env file, which contains the following environment variables:
 ```env
-POSTGRES_USER=root
-POSTGRES_PASSWORD=root
+POSTGRES_USER=user
+POSTGRES_PASSWORD=password
 POSTGRES_HOST=pgdatabase
 POSTGRES_PORT=5432
 POSTGRES_DB=ny_taxi
@@ -479,6 +479,7 @@ variable "boot_disk_device_name" {
 variable "boot_disk_image" {
   type    = string
   default = "projects/ubuntu-os-cloud/global/images/ubuntu-2004-focal-v20240508"
+  # detailed configuration parameters like these can provide attackers with valuable information about your infrastructure:
 }
 
 variable "boot_disk_size" {
@@ -545,7 +546,8 @@ variable "stack_type" {
 
 variable "subnetwork" {
   type    = string
-  default = "projects/data-engineering-4233/regions/us-central1/subnetworks/default"
+  default = "projects/<project name>/regions/us-central1/subnetworks/default"
+  # This contains your project ID and specific network details, which can be used to target your project.
 }
 
 variable "automatic_restart" {
@@ -570,7 +572,8 @@ variable "provisioning_model" {
 
 variable "service_account_email" {
   type    = string
-  default = "xxxxxx@developer.gserviceaccount.com"
+  default = "xxxxxx@developer.gserviceaccount.com" 
+  #This email address can be used to identify your specific service account, which might be exploited to gain unauthorized access to your Google Cloud resources.
 }
 
 variable "service_account_scopes" {
@@ -603,6 +606,7 @@ variable "enable_vtpm" {
 variable "zone" {
   type    = string
   default = "us-central1-b"
+  # detailed configuration parameters like these can provide attackers with valuable information about your infrastructure:
 }
 ```
 
